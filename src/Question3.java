@@ -13,7 +13,7 @@ public class Question3 {
 	private Map<String, String> vecteur2 = new HashMap<String, String>();
 	
 	/**
-	 * methode qui permet de parcourir le repertoire ou il y a tout les fichiers pdf
+	 * methode qui permet de parcourir le repertoire ou il y a tout les fichiers pdf (offres de stage)
 	 */
 	public void parcourirRepertoirePDF(){
 		File dir = new File("offresStage");
@@ -48,12 +48,13 @@ public class Question3 {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-				
+		
+		contenu.toLowerCase();
 		remplirV1(contenu, file.getName());
 	}
 	
 	/**
-	 * remplire v1 avec tout les fichiers doublonnes
+	 * remplire v1 et v2 avec tout les fichiers (nom et contenu)
 	 */
 	public void remplirV1(String contenu, String fichier){
 		vecteur1.put(fichier, contenu);
@@ -61,15 +62,26 @@ public class Question3 {
 	}
 	
 	/**
-	 * remplire v2 fichiers pas doublons
+	 * on parcour les 2 vecteurs V1 et V2, dans le vecteur 2 on efface les offres de stage qui sont en doublons
+	 * a la fin du traitement le V2 contiendra les fichiers sans doublons
+	 * @throws IOException 
 	 */
-	public void remplirV2(){
-		int nbNonDublons = 0;
+	public void trouverEffacerDoublons() throws IOException{
+		int nbDublons = 0;
 		String contenuAux = "";
 		int i = 0;
 		int x = 0;
 		int test = 0;
 	
+		File ff=new File("SansDoublons.txt"); // définir l'arborescence
+		ff.createNewFile();
+		FileWriter ffw=new FileWriter(ff);
+		
+		File ff1=new File("doublons.txt"); // définir l'arborescence
+		ff1.createNewFile();
+		FileWriter ffw1 =new FileWriter(ff1);
+		
+		
 		
 		for(Map.Entry<String, String> m : vecteur1.entrySet()){
 			contenuAux = m.getValue();
@@ -83,8 +95,16 @@ public class Question3 {
 				//if( distance == 0){
 				if(entry.getValue().equals(contenuAux)){
 					i++;
+					
 					if(i > 1){
+						
+						nbDublons++;
+						ffw1.write(entry.getKey());
+						ffw1.write("\n");
 						it.remove();
+					}else{
+						ffw.write(entry.getKey());
+						ffw.write("\n");
 					}
 				}
 				
@@ -95,13 +115,17 @@ public class Question3 {
 				
 		}
 		
+		ffw.close();
+		ffw1.close();
 		System.out.println("Taille vecteur d'origine: " + vecteur1.size());
 		System.out.println("Taille vecteur sans doublons: " + vecteur2.size());
+		System.out.println("Numero de doublons doublons: " + nbDublons);
 		
 	}
 	
 	/**
-	 * calculer la distance entre les contenus de pdf
+	 * calculer la distance entre les contenus de pdf (distance de lenvenshtein)
+	 * si la distance est egale a 0, ça veut dire que le fichiers sont des doublons
 	 * @param lhs
 	 * @param rhs
 	 * @return
